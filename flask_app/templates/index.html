@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackgroundAway - Simple Background Removal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+        }
+        .drop-zone {
+            border: 2px dashed #CBD5E0;
+            transition: all 0.3s ease;
+        }
+        .drop-zone:hover {
+            border-color: #6366F1;
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+        .btn-process {
+            background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
+            transition: transform 0.2s ease;
+        }
+        .btn-process:hover {
+            transform: translateY(-2px);
+        }
+        .image-preview {
+            transition: transform 0.3s ease;
+            max-width: 100%; /* Ensure the image doesn't exceed the container width */
+            max-height: 100%; /* Ensure the image doesn't exceed the container height */
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+        .image-preview img {
+            max-width: 100%; /* Ensure the image fits within the preview container */
+            max-height: 100%; /* Ensure the image fits within the preview container */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <header class="gradient-bg text-white p-6 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-magic text-2xl"></i>
+                <h1 class="text-2xl font-bold">BackgroundAway</h1>
+            </div>
+            <a href="https://github.com" target="_blank" class="bg-white text-indigo-600 px-6 py-2 rounded-full font-semibold shadow-md hover:bg-indigo-100 transition-all duration-300 flex items-center space-x-2">
+                <i class="fab fa-github text-xl"></i>
+                <span>Star on GitHub</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-grow p-6 flex flex-col md:flex-row gap-6">
+        <section class="md:w-1/2 flex flex-col">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Upload Image</h2>
+                <div class="drop-zone h-64 rounded-lg flex flex-col items-center justify-center cursor-pointer p-6">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-500 text-center mb-2">Drag and drop your image here</p>
+                    <p class="text-gray-400 text-sm text-center">or</p>
+                    <label class="mt-3 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg cursor-pointer hover:bg-indigo-100 transition">
+                        Browse Files
+                        <input type="file" class="hidden" accept="image/*">
+                    </label>
+                </div>
+            </div>
+            
+            <button class="btn-process px-6 py-3 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <i class="fas fa-magic mr-2"></i> Remove Background
+            </button>
+        </section>
+        
+        <section class="md:w-1/2 bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Result</h2>
+                <div class="flex space-x-2">
+                    <button class="p-2 text-gray-600 hover:text-indigo-600 transition">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-indigo-600 transition">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-center justify-center h-96 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                <div class="image-preview hidden">
+                    <!-- Processed image will show here -->
+                    <img src="/api/placeholder/400/320" alt="placeholder" class="rounded-lg shadow-md" />
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-image text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-500">Upload an image and click "Remove Background"</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex gap-3">
+                <button class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-gray-700">
+                    <i class="fas fa-undo mr-1"></i> Reset
+                </button>
+                <button class="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition" id="download_result">
+                    <i class="fas fa-check mr-1"></i> Save Result
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-6">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-magic text-xl mr-2"></i>
+                    <span class="font-bold">BackgroundAway</span>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="https://patrick-chidera.vercel.app/" target="_blank" class="hover:text-white transition">Meet The Developer</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple client-side JavaScript for interaction
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.querySelector('.drop-zone');
+            const fileInput = document.querySelector('input[type="file"]');
+            const processButton = document.querySelector('.btn-process');
+            const imagePreview = document.querySelector('.image-preview');
+            const placeholderText = document.querySelector('.image-preview + div');
+            const download_buton = document.querySelector("#download_result")
+            // Simulate file upload and preview
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.querySelector('img').src = e.target.result;
+                        imagePreview.classList.remove('hidden');
+                        placeholderText.classList.add('hidden');
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Process button animation
+            processButton.addEventListener('click', async function() {
+                const form = new FormData()
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                    form.append("image",fileInput.files[0])
+                 const data = await   fetch("/upload",{method:"POST",body:form})
+                    this.innerHTML = '<i class="fas fa-magic mr-2"></i>Remove Background';
+                
+                    // display the image
+                    const blob  = await data.blob()
+                    const url = URL.createObjectURL(blob);
+                    document.querySelector("img").src = url
+              console.log(url);
+              
+                                
+            });
+            
+            // Drag and drop functionality
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('border-indigo-500', 'bg-indigo-50');
+            });
+            
+            dropZone.addEventListener('dragleave', function() {
+                this.classList.remove('border-indigo-500', 'bg-indigo-50');
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('border-indigo-500', 'bg-indigo-50');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    fileInput.files = e.dataTransfer.files;
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            });
+           download_buton.addEventListener("click", ()=>{
+                const url = document.querySelector("img").src
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'myfile.png'; // 🔽 Set the file name and extension here
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url); 
+            })
+        });
+    </script>
+</body>
+</html>

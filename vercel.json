@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "flask_app/app.py",
+      "src": "flask_app/main.py",
       "use": "@vercel/python",
       "config": {
         "installCommand": "pip install -r requirements.txt"
@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "flask_app/app.py"
+      "dest": "flask_app/main.py"
     }
   ]
 }

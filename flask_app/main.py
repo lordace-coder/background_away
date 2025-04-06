@@ -1,6 +1,7 @@
 from flask import Flask,render_template,request,send_from_directory
-from remove_background import remove_background
 import os
+from rembg import remove
+
 
 app = Flask(__name__)
 
@@ -8,6 +9,13 @@ app = Flask(__name__)
 ALLOWED_EXTENSIONS = {"png","jpeg"}
 
 app.config["UPLOAD_FOLDER"] = "media"
+
+
+def remove_background(img_path, output_path):
+    with open(img_path, "rb") as img:
+        with open(output_path, "wb") as output:
+            file = img.read()
+            output.write(remove(file))
 
 
 @app.get("/")

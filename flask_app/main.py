@@ -39,4 +39,4 @@ def handle_image():
     return send_from_directory(app.config["UPLOAD_FOLDER"],path="output.png")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)), debug=True)
